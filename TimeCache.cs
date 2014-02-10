@@ -24,18 +24,9 @@ namespace PropertyChange
         public T Get(string key, Func<T> getValue)
         {
             var cache = m_cache[key];
-            if (cache != null)
-            {
-                var value = cache as T;
-                if (value != null)
-                {
-                    return value;
-                }
-            }
-
-            var v = getValue();
-            m_cache.Add(key, v, DateTimeOffset.Now.AddSeconds(m_cacheLife));
-            return v;
+            T value = m_cache[key] as T ?? getValue();
+            m_cache.Set(key, value, DateTimeOffset.Now.AddSeconds(m_cacheLife));
+            return value;
 
         }
     }
