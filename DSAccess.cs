@@ -66,7 +66,7 @@ namespace PropertyChange
         readonly static string s_queryString = "*[System[EventID=4662]]"; // XPATH Query
 
         //static MemoryCache s_objCache = new MemoryCache("DSAccessCache");
-        static TimeCache<String> s_objCache = new TimeCache<string>(new TimeSpan(1, 0, 0));
+        static ICache<String> s_objCache = new TimeCache<string>(new TimeSpan(1, 0, 0));
         static String GetObj(string guid)
         {
             return s_objCache.Get(guid, () => {

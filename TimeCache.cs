@@ -15,17 +15,20 @@ namespace PropertyChange
     public class TimeCache<T> : ICache<T> where T : class
     {
         public MemoryCache m_cache = new MemoryCache(Guid.NewGuid().ToString());
-        long m_cacheLife;
+        TimeSpan m_cacheLife;
 
         public TimeCache(TimeSpan cacheLifeTime)
         {
-            m_cacheLife = (long)cacheLifeTime.TotalSeconds;
+            m_cacheLife = cacheLifeTime;
         }
         public T Get(string key, Func<T> getValue)
         {
-            var cache = m_cache[key];
-            T value = m_cache[key] as T ?? getValue();
-            m_cache.Set(key, value, DateTimeOffset.Now.AddSeconds(m_cacheLife));
+            T value = m_cache[key] as T;
+            if (value == null)
+            {
+                value = getValue();
+                m_cache.Add(key, value, new CacheItemPolicy() { SlidingExpiration = m_cacheLife });
+            }
             return value;
 
         }
