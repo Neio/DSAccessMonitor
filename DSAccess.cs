@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.DirectoryServices;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,17 +65,22 @@ namespace PropertyChange
 
         readonly static string s_queryString = "*[System[EventID=4662]]"; // XPATH Query
 
-
+        //static MemoryCache s_objCache = new MemoryCache("DSAccessCache");
+        static TimeCache<String> s_objCache = new TimeCache<string>(new TimeSpan(1, 0, 0));
         static String GetObj(string guid)
         {
-            try
-            {
-                return new DirectoryEntry(String.Format("LDAP://<GUID={0}>", guid)).Properties["distinguishedName"].Value as string;
-            }
-            catch
-            {
-                return "<Unknown Object>";
-            }
+            return s_objCache.Get(guid, () => {
+                try
+                {
+                    var value = new DirectoryEntry(String.Format("LDAP://<GUID={0}>", guid)).Properties["distinguishedName"].Value as string;
+                    return value;
+                }
+                catch
+                {
+                    return "<Unknown Object>";
+                }
+            });
+            
         }
 
         private bool m_disposed = false;
