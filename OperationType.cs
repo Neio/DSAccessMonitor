@@ -484,7 +484,11 @@ namespace PropertyChange
             {"7685", "Write Property"},
             {"7686", "Delete Tree"},
             {"7687", "List Object"},
-            {"7688", "Control Access"}
+            {"7688", "Control Access"},
+
+            
+            {"14674", "Value Created"},
+            {"14675", "Value Deleted"}
         };
     }
 }

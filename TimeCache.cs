@@ -21,6 +21,7 @@ namespace PropertyChange
         {
             m_cacheLife = cacheLifeTime;
         }
+
         public T Get(string key, Func<T> getValue)
         {
             T value = m_cache[key] as T;

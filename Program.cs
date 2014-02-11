@@ -27,26 +27,42 @@ namespace PropertyChange
             }
             Console.WriteLine("-- Press Ctrl+C to exit --");
 
+            Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
+            {
+                e.Cancel = true;
+                s_keepRunning = false;
+            };
+
             using (DSAccess access = new DSAccess(computer))
             {
-                access.NewEvent += NewEvent;
-
-                Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
+                using (DSModify modify = new DSModify(computer))
                 {
-                    e.Cancel = true;
-                    s_keepRunning = false;
-                };
+                    access.NewEvent += AccessNewEvent;
+                    modify.NewEvent += ModifyNewEvent;
 
-                while (s_keepRunning)
-                {
-                    Thread.Sleep(100);
+                    while (s_keepRunning)
+                    {
+                        Thread.Sleep(100);
+                    }
                 }
             }
             Console.WriteLine("Stopped");
 
         }
 
-        static void NewEvent(DSAccessRecord item)
+        static void ModifyNewEvent(DSModifyRecord item)
+        {
+            Console.WriteLine("[Time] {0}", item.Time);
+            Console.WriteLine("[Operator] {0}", item.Operator);
+            Console.WriteLine("[Target] {0}", item.Target);
+            Console.WriteLine("[Operation] {0}", item.Operation);
+            Console.WriteLine("[Property] {0}", item.Property);
+            Console.WriteLine("[Value] {0}", item.Value);
+
+            Console.WriteLine();
+        }
+
+        static void AccessNewEvent(DSAccessRecord item)
         {
             Console.WriteLine("[Time] {0}", item.Time);
             Console.WriteLine("[Operator] {0}", item.Operator);
