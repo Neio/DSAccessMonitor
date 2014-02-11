@@ -9,29 +9,26 @@ using System.Threading.Tasks;
 
 namespace PropertyChange
 {
-    class DSModify : DSEvent<DSModifyRecord>
+    class DSCreated : DSEvent<DSCreatedRecord>
     {
-        public DSModify(string remoteComputer, string domain, string username, string password)
+        public DSCreated(string remoteComputer, string domain, string username, string password)
             : base(remoteComputer, domain, username, password) { }
 
-        public DSModify(string remoteComputer)
+        public DSCreated(string remoteComputer)
             : base(remoteComputer) { }
 
-        public DSModify() : base() { }
+        public DSCreated() : base() { }
 
         protected override string GetQueryString()
         {
-            return "*[System[EventID=5136]]";
+            return "*[System[EventID=5137]]";
         }
 
-        protected override DSModifyRecord Parse(EventRecord item)
+        protected override DSCreatedRecord Parse(EventRecord item)
         {
-            var ds = new DSModifyRecord();
+            var ds = new DSCreatedRecord();
             ds.Time = item.TimeCreated.Value;
-            ds.Operation = ((string)item.Properties[14].Value).Contains("14674") ? DSModifyType.ValueCreated : DSModifyType.ValueDeleted;
             ds.Target = item.Properties[8].Value as string;
-            ds.Property = item.Properties[11].Value as string;
-            ds.Value = item.Properties[13].Value as string;
             ds.Operator = item.Properties[3].Value as string;
             try
             {
@@ -45,20 +42,11 @@ namespace PropertyChange
         }
     }
 
-    enum DSModifyType
-    {
-        ValueCreated,
-        ValueDeleted
-    }
-
-    class DSModifyRecord
+    class DSCreatedRecord
     {
         public Guid TargetGuid { get; set; }
         public DateTime Time { get; set; }
-        public DSModifyType Operation { get; set; }   // OperationType
         public String Target { get; set; }      // ObjectDN
-        public String Property { get; set; }    // AttributeLDAPDisplayName
-        public String Value { get; set; }       // AttributeValue
         public String Operator { get; set; }    // SubjectUserName
     }
 }
