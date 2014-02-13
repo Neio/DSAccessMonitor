@@ -39,6 +39,17 @@ namespace PropertyChange
             m_watcher.Enabled = true;
         }
 
+        public void ResetListener()
+        {
+            if (!m_watcher.Enabled)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Reset listener");
+                Console.ResetColor();
+                m_watcher.Enabled = true;
+            }
+        }
+
         public event Action<T> NewEvent;
 
         private EventLogWatcher m_watcher;

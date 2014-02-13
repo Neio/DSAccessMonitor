@@ -18,12 +18,12 @@ namespace PropertyChange
             string computer = null;
             if (args.Length == 1)
             {
-                Console.WriteLine("Listening to Active Directory Access in Remote Event Logs from {0}", args[0]);
+                Console.WriteLine("Active Directory Changes in Remote Event Logs from {0}", args[0]);
                 computer = args[0];
             }
             else
             {
-                Console.WriteLine("Listening to Active Directory Access in Local Event Logs");
+                Console.WriteLine("Active Directory Changes in Local Event Logs");
             }
             Console.WriteLine("-- Press Ctrl+C to exit --");
 
@@ -33,6 +33,7 @@ namespace PropertyChange
                 s_keepRunning = false;
             };
 
+            TimeSpan eventResetTime = new TimeSpan(1, 0, 0);
             using (DSAccess access = new DSAccess(computer))
             {
                 using (DSModify modify = new DSModify(computer))
@@ -45,7 +46,16 @@ namespace PropertyChange
 
                         while (s_keepRunning)
                         {
-                            Thread.Sleep(100);
+                            DateTime resetTime = DateTime.Now + eventResetTime;
+
+                            while (s_keepRunning && resetTime > DateTime.Now)
+                            {
+                                Thread.Sleep(100);
+                            }
+
+                            created.ResetListener();
+                            modify.ResetListener();
+                            access.ResetListener();
                         }
                     }
                 }
